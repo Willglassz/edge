@@ -1,25 +1,32 @@
 ---
 name: whatsapp-sender
-description: Bu yetenek, LLM'in bir webhook aracılığıyla WhatsApp mesajları göndermesini sağlar. Telefon numarası veya mesaj metni eksikse kullanıcıya sormayı bilir.
+description: Webhook tabanlı WhatsApp mesaj gönderimi. Kullanıcı bir mesaj göndermek istediğinde bu yeteneği kullanın. Telefon numarası veya mesaj metni eksikse kullanıcıdan talep edin.
 ---
 
-# WhatsApp Mesaj Gönderici
+# WhatsApp Mesaj Gönderici (Agent Skill)
 
-Bu yetenek, bir on-device LLM'in bir webhook servisi (n8n gibi) üzerinden WhatsApp mesajları göndermesine olanak tanır.
+Bu beceri, on-device LLM'in harici bir n8n webhook'u aracılığıyla WhatsApp mesajları göndermesini sağlar.
+
+## Kullanım Durumları (Triggers)
+- Birine WhatsApp mesajı gönderilmek istendiğinde.
+- "X kişisine Y mesajını at" gibi komutlarda.
+- WhatsApp üzerinden iletişim kurma taleplerinde.
 
 ## Talimatlar
-
-1.  **Bilgi Kontrolü:** Kullanıcı bir mesaj göndermek istediğinde, her zaman mesaj metnini (`message_text`) ve alıcının telefon numarasını (`phone_number`) kontrol edin.
-2.  **Eksik Bilgi:** Eğer telefon numarası veya mesaj metni sağlanmamışsa, devam etmeden önce nazikçe bu bilgileri kullanıcıdan isteyin.
-3.  **Araç Çağrısı:** Her iki bilgi de mevcut olduğunda, `send_whatsapp_message` aracını uygun parametrelerle çağırın.
+1.  **Doğrulama:** `phone_number` ve `message_text` parametrelerinin mevcut olduğundan emin olun.
+2.  **Eksik Bilgi:** Eğer numara eksikse "Kime göndermemi istersiniz?" diye sorun. Mesaj eksikse "Mesajınız ne olsun?" diye sorun.
+3.  **Format:** Telefon numarasının uluslararası formatta (+ ile başlayan) olmasını tercih edin, ancak kullanıcı sadece rakam verirse kabul edin.
+4.  **İşlem:** Bilgiler tamamsa `send_whatsapp_message` aracını çağırın.
 
 ## Araçlar
 
 ### send_whatsapp_message
-
-WhatsApp mesajını bir arka plan işlemi (webview) aracılığıyla webhook'a gönderir.
+Arka plandaki bir webview aracılığıyla mesajı webhook'a iletir.
 
 **Parametreler:**
+- `phone_number` (string, required): Alıcının telefon numarası. Örn: "+905001234567"
+- `message_text` (string, required): Gönderilecek metin içeriği.
 
-- `phone_number` (string): Mesajın gönderileceği uluslararası formatta telefon numarası (örn: "+905001234567").
-- `message_text` (string): Gönderilecek mesajın içeriği.
+**Yanıtlar:**
+- `status: "success"` -> Mesaj başarıyla sıraya alındı.
+- `status: "error"` -> Bir ağ hatası veya webhook sorunu oluştu.
