@@ -1,16 +1,16 @@
 {
   "name": "whatsapp-sender-extension",
-  "version": "1.0.1",
-  "description": "Google AI Edge Gallery için optimize edilmiş WhatsApp gönderici becerisi.",
+  "version": "1.1.0",
+  "description": "WhatsApp Mesaj Gönderici - Edge Gallery Standartlarına Uygun",
   "author": "Willglassz",
   "skills": [
     {
       "name": "whatsapp-sender",
-      "path": "./whatsapp-sender"
+      "path": "./skills/whatsapp-sender"
     }
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Willglassz/edge.git"
+    "url": "https://github.com/Willglassz/edge"
   }
 }
