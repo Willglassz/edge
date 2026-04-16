@@ -1,0 +1,10 @@
+{
+  "name": "whatsapp-sender",
+  "version": "1.0.0",
+  "description": "Google AI Edge Gallery için WhatsApp Mesaj Gönderici Yeteneği",
+  "author": "Willglassz",
+  "skills": [
+    "whatsapp-sender"
+  ],
+  "repository": "https://github.com/Willglassz/edge"
+}
