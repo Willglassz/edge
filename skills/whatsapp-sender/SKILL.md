@@ -1,34 +1,40 @@
 ---
-name: whatsapp-sender
-description: A skill to send WhatsApp messages via a webhook. It asks for the message text and phone number if they are not provided.
+name: mood-music
+description: A skill to suggest or play music based on the user's mood, including analyzing images or audio, by querying available genres and generating music via the Loudly API.
 metadata:
-  homepage: https://github.com/Willglassz/edge/tree/main/skills/whatsapp-sender
+  require-secret: true
+  require-secret-description: you can get api key from https://www.loudly.com/developers/apps after registering an account
+  homepage: https://github.com/google-ai-edge/gallery/tree/main/skills/featured/mood-music
 ---
 
-# WhatsApp Mesaj Gönderici (Agent Skill)
+# Mood Music
 
-Bu beceri, on-device LLM'in harici bir n8n webhook'u aracılığıyla WhatsApp mesajları göndermesini sağlar.
+## Instructions
 
-## Kullanım Durumları (Triggers)
-- Birine WhatsApp mesajı gönderilmek istendiğinde.
-- "X kişisine Y mesajını at" gibi komutlarda.
-- WhatsApp üzerinden iletişim kurma taleplerinde.
+You MUST use a strict two-step process to generate music. This ensures you only request musical genres that are currently supported by the Loudly API.
 
-## Talimatlar
-1.  **Doğrulama:** `phone_number` ve `message_text` parametrelerinin mevcut olduğundan emin olun.
-2.  **Eksik Bilgi:** Eğer numara eksikse "Kime göndermemi istersiniz?" diye sorun. Mesaj eksikse "Mesajınız ne olsun?" diye sorun.
-3.  **Format:** Telefon numarasının uluslararası formatta (+ ile başlayan) olmasını tercih edin, ancak kullanıcı sadece rakam verirse kabul edin.
-4.  **İşlem:** Bilgiler tamamsa `send_whatsapp_message` aracını çağırın.
+### Step 1: Fetch Available Genres
+Call the `run_js` tool with `get_genres.html` as the script name and an empty JSON payload (`{}`). 
+- This will return a list of currently available genres and their descriptions. 
+- You MUST review this list to understand the available musical palettes.
 
-## Araçlar
+### Step 2: Analyze and Generate
+Once you have the valid genres, map the user's request to the best fit and call `run_js` with `index.html` to generate the track.
 
-### send_whatsapp_message
-Arka plandaki bir webview aracılığıyla mesajı webhook'a iletir.
+**Handling Inputs:**
+- **Text Inputs**: Translate abstract mood requests into a concrete, matching genre from the fetched list, along with an appropriate energy level.
+- **Media Inputs (Images/Audio)**: If the user provides an image or audio clip, analyze the media to determine its underlying mood, atmosphere, or vibe. Translate this analysis strictly into one of the fetched genres.
 
-**Parametreler:**
-- `phone_number` (string, required): Alıcının telefon numarası. Örn: "+905001234567"
-- `message_text` (string, required): Gönderilecek metin içeriği.
+**Generation Payload (for index.html):**
+Your JSON payload for `index.html` MUST strictly use these text fields to represent the vibe:
+- **genre**: String, Required. MUST be an exact match to a genre name retrieved in Step 1.
+- **genre_blend**: String, Optional. A secondary genre to blend (also from Step 1).
+- **duration**: Integer, Optional. Length in seconds (30-420). Default is 120.
+- **energy**: String, Optional. Vibe ("low", "high", "original").
+- **bpm**: Integer, Optional. Specific tempo in Beats Per Minute.
 
-**Yanıtlar:**
-- `status: "success"` -> Mesaj başarıyla sıraya alındı.
-- `status: "error"` -> Bir ağ hatası veya webhook sorunu oluştu.
+### Invocation Triggers
+You should invoke this skill when the user:
+- Asks for music for a specific mood.
+- Asks for playlist ideas for a vibe.
+- Uploads an image or audio clip and asks for music to match it.
