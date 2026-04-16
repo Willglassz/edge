@@ -1,6 +1,6 @@
 ---
-name: whatsapp-sender
-description: Webhook tabanlı WhatsApp mesaj gönderimi. Kullanıcı bir mesaj göndermek istediğinde bu yeteneği kullanın. Telefon numarası veya mesaj metni eksikse kullanıcıdan talep edin.
+name: "whatsapp-sender"
+description: "Webhook tabanlı WhatsApp mesaj gönderimi. Kullanıcı bir mesaj göndermek istediğinde bu yeteneği kullanın. Telefon numarası veya mesaj metni eksikse kullanıcıdan talep edin."
 ---
 
 # WhatsApp Mesaj Gönderici (Agent Skill)
