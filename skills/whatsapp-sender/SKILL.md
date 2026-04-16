@@ -1,6 +1,8 @@
 ---
-name: "whatsapp-sender"
-description: "Webhook tabanlı WhatsApp mesaj gönderimi. Kullanıcı bir mesaj göndermek istediğinde bu yeteneği kullanın. Telefon numarası veya mesaj metni eksikse kullanıcıdan talep edin."
+name: whatsapp-sender
+description: A skill to send WhatsApp messages via a webhook. It asks for the message text and phone number if they are not provided.
+metadata:
+  homepage: https://github.com/Willglassz/edge/tree/main/skills/whatsapp-sender
 ---
 
 # WhatsApp Mesaj Gönderici (Agent Skill)
