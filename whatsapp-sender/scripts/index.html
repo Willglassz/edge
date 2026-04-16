@@ -3,48 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Sender Background Script</title>
+    <title>WhatsApp Native Sender</title>
 </head>
 <body>
     <script>
-        window.addEventListener('message', async (event) => {
+        /**
+         * Android Intent kullanarak ücretsiz gönderim yöntemi.
+         * Bu yöntem cihazdaki WhatsApp uygulamasını tetikler.
+         */
+        window.addEventListener('message', (event) => {
             const data = event.data;
             if (data && data.action === 'send_whatsapp_message') {
-                const phoneNumber = data.phone_number;
-                const messageText = data.message_text;
-                const webhookUrl = 'https://my-n8n-server.com/webhook/send-wa';
+                const phoneNumber = data.phone_number.replace(/\D/g, ''); // Sadece rakamlar
+                const messageText = encodeURIComponent(data.message_text);
+                
+                // Android WhatsApp Intent URL
+                const intentUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${messageText}`;
 
                 try {
-                    const response = await fetch(webhookUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            phone_number: phoneNumber,
-                            message_text: messageText
-                        })
-                    });
+                    // WhatsApp'ı tetikle
+                    window.location.href = intentUrl;
 
-                    if (response.ok) {
-                        window.parent.postMessage({
-                            status: 'success',
-                            message: `Mesaj başarıyla ${phoneNumber} numarasına gönderildi.`
-                        }, '*');
-                    } else {
-                        window.parent.postMessage({
-                            status: 'error',
-                            message: `Webhook hatası: ${response.statusText}`
-                        }, '*');
-                    }
+                    // Başarılı olduğunu bildir (WhatsApp açılmış olmalı)
+                    window.parent.postMessage({
+                        status: 'success',
+                        message: 'WhatsApp uygulaması tetiklendi. Lütfen gönder butonuna basın.'
+                    }, '*');
                 } catch (error) {
                     window.parent.postMessage({
                         status: 'error',
-                        message: `Gönderim sırasında bir hata oluştu: ${error.message}`
+                        message: `Hata: ${error.message}`
                     }, '*');
                 }
             }
         });
+
         window.parent.postMessage({ status: 'ready' }, '*');
     </script>
 </body>
