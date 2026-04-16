@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Sender Background Script</title>
+</head>
+<body>
+    <script>
+        /**
+         * Bu HTML dosyası on-device LLM tarafından görünmez bir webview'da arka planda çalıştırılır.
+         * window.postMessage() üzerinden gelen olayları dinleyerek WhatsApp gönderim işlemini gerçekleştirir.
+         */
+
+        window.addEventListener('message', async (event) => {
+            const data = event.data;
+
+            // Aksiyonun send_whatsapp_message olup olmadığını kontrol et
+            if (data && data.action === 'send_whatsapp_message') {
+                const phoneNumber = data.phone_number;
+                const messageText = data.message_text;
+                const webhookUrl = 'https://my-n8n-server.com/webhook/send-wa';
+
+                try {
+                    // Webhook'a JSON verisini gönder
+                    const response = await fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            phone_number: phoneNumber,
+                            message_text: messageText
+                        })
+                    });
+
+                    if (response.ok) {
+                        // Başarılı olduğunda ebeveyn pencereye (LLM'e) haber ver
+                        window.parent.postMessage({
+                            status: 'success',
+                            message: `Mesaj başarıyla ${phoneNumber} numarasına gönderildi.`
+                        }, '*');
+                    } else {
+                        // Webhook hatası
+                        window.parent.postMessage({
+                            status: 'error',
+                            message: `Webhook hatası: ${response.statusText}`
+                        }, '*');
+                    }
+                } catch (error) {
+                    // Genel ağ veya bağlantı hatası
+                    window.parent.postMessage({
+                        status: 'error',
+                        message: `Gönderim sırasında bir hata oluştu: ${error.message}`
+                    }, '*');
+                }
+            }
+        });
+
+        // Başlatıldığını bildir
+        window.parent.postMessage({ status: 'ready' }, '*');
+    </script>
+</body>
+</html>
